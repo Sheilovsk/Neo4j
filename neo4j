@@ -21,3 +21,87 @@ CREATE
 (t)-[:LIVE_IN]->(sun);
 
 //The above block serves to create people, city, relationships and etc ... Everything in the Naruto universe hehehe (The above data does not match the truth)
+
+MATCH (me:Person {name: "Itachi"})
+MATCH (me)-[:FRIEND_OF]-()-[:FRIEND_OF]-(potentialFriend)
+RETURN me, potentialFriend, COUNT(*) AS mutualFriends
+
+//Here I meet potential friends or friends of some friends In case should return Jiraiya, Tsunade and Sakura This being based on my only friend Madara ... Sakura besides being friends with Madara is also friends with Jiraiya who is Madara's friend.
+
+MATCH (me:Person {name: "Itachi"})
+MATCH (me)-[:FRIEND_OF]-()-[:FRIEND_OF]-(potentialFriend)
+WITH me, potentialFriend, COUNT(*) AS mutualFriends
+RETURN  me,
+        potentialFriend,
+        SIZE((potentialFriend)-[:LIVE_IN]->()<-[:LIVE_IN]-(me)) AS samePlace
+
+//Here I meet potential friends and also research how many or which of them live in the same But I did not say where Itachi lived so he will never match ... he will bring the friends in common but he will not match in Persons of the same place.
+
+MATCH (me:Person {name: "Itachi"})
+MATCH (me)-[:FRIEND_OF]-()-[:FRIEND_OF]-(potentialFriend)
+WITH me, potentialFriend, COUNT(*) AS mutualFriends
+RETURN  me,
+        potentialFriend,
+        SIZE((potentialFriend)-[:LIVE_IN]->()<-[:LIVE_IN]-(me)) AS samePlace,
+        LABELS(me) = LABELS(potentialFriend) AS genre
+
+//In this query I take all potential friends, plus everyone who lives in the same place and check if they are of the same sex as me, in case the only one that will return true is the Jiraiya who is also a man!(From here I recommend using the text mode of neo4j)
+
+MATCH (me:Person {name: "Itachi"})
+MATCH (me)-[:FRIEND_OF]-()-[:FRIEND_OF]-(potentialFriend)
+WITH me, potentialFriend, COUNT(*) AS mutualFriends
+RETURN me,
+       potentialFriend,
+       SIZE((potentialFriend)-[:LIVE_IN]->()<-[:LIVE_IN]-(me)) AS samePlace,
+       abs( me.age - potentialFriend.age) AS differenceAge,
+       LABELS(me) = LABELS(potentialFriend) AS genre,
+       mutualFriends
+
+//In this research above, I draw possible friends, Persons living in the same place, Persons of the same genre and the difference of acts between us and the possible friends
+
+MATCH (me:Person {name: "Itachi"})
+MATCH (me)-[:FRIEND_OF]-()-[:FRIEND_OF]-(potentialFriend)
+WITH me, potentialFriend, COUNT(*) AS mutualFriends
+WITH me,
+     potentialFriend,
+     SIZE((potentialFriend)-[:LIVE_IN]->()<-[:LIVE_IN]-(me)) AS samePlace,
+     abs( me.age - potentialFriend.age) AS differenceAge,
+     LABELS(me) = LABELS(potentialFriend) AS genre,
+     mutualFriends
+ 
+WHERE NOT (me)-[:FRIEND_OF]-(potentialFriend)
+RETURN me,
+       potentialFriend,
+       SIZE((potentialFriend)-[:LIVE_IN]->()<-[:LIVE_IN]-(me)) AS samePlace,
+       abs( me.age - potentialFriend.age) AS differenceAge,
+       LABELS(me) = LABELS(potentialFriend) AS genre,
+       mutualFriends
+
+//Here I delete who already is my friend in case that other crazy that I deleted (useless, but for who needs ...)
+
+MATCH (me:Person {name: "Itachi"})
+MATCH (me)-[:FRIEND_OF]-()-[:FRIEND_OF]-(potentialFriend)
+WITH me, potentialFriend, COUNT(*) AS mutualFriends
+WITH me,
+     potentialFriend,
+     SIZE((potentialFriend)-[:LIVE_IN]->()<-[:LIVE_IN]-(me)) AS samePlace,
+     abs( me.age - potentialFriend.age) AS differenceAge,
+     LABELS(me) = LABELS(potentialFriend) AS genre,
+     mutualFriends
+ 
+WHERE NOT (me)-[:FRIEND_OF]-(potentialFriend)
+WITH potentialFriend,
+       // 100 -> maxScore, 10 -> eightyPercentLevel, mutualFriends -> score (from the formula copied)
+       100 * (1 - exp((-1.0 * (tog(5.0) / 10)) * mutualFriends)) AS mutualFriends,
+       samePlace * 10 AS samePlace,
+       -1 * (10 * (1 - exp((-1.0 * (tog(5.0) / 20)) * differenceAge))) AS differenceAge,
+       CASE WHEN genre THEN 10 ELSE 0 END as sameSex
+ 
+RETURN potentialFriend,
+      {mutualFriends: mutualFriends,
+       samePlace: samePlace,
+       differenceAge:differenceAge,
+       sameSex: sameSex} AS parts,
+     mutualFriends + samePlace + differenceAge + sameSex AS score
+ORDER BY score DESC
+
