@@ -1,0 +1,23 @@
+CREATE
+(m:Person:Shinobi {name:'Madara', age:30}),
+(s:Person:Kunoichi {name:'Sakura', age:20}),
+(j:Person:Shinobi {name:'Jiraiya', age:60}),
+(i:Person:Shinobi {name:'Itachi', age:30}),
+(t:Person:Kunoichi {name:'Tsunade', age:60}),
+(c:Person:Shinobi {name:'Orochimaru', age:50}),
+ 
+(kon:City {name:'Konoha'}),
+(sun:City {name:'Suna'}),
+ 
+(m)-[:FRIEND_OF]->(s),
+(m)-[:FRIEND_OF]->(t),
+(m)-[:FRIEND_OF]->(i),
+(m)-[:FRIEND_OF]->(j),
+(s)-[:FRIEND_OF]->(j),
+(c)-[:FRIEND_OF]->(j),
+(s)-[:LIVE_IN]->(kon),
+(j)-[:LIVE_IN]->(kon),
+(m)-[:LIVE_IN]->(kon),
+(t)-[:LIVE_IN]->(sun);
+
+//The above block serves to create people, city, relationships and etc ... Everything in the Naruto universe hehehe (The above data does not match the truth)
