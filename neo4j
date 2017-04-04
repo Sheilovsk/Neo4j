@@ -4,7 +4,7 @@ CREATE
 (j:Person:Shinobi {name:'Jiraiya', age:60}),
 (i:Person:Shinobi {name:'Itachi', age:30}),
 (t:Person:Kunoichi {name:'Tsunade', age:60}),
-(c:Person:Shinobi {name:'Orochimaru', age:50}),
+(o:Person:Shinobi {name:'Orochimaru', age:50}),
  
 (kon:City {name:'Konoha'}),
 (sun:City {name:'Suna'}),
@@ -14,7 +14,7 @@ CREATE
 (m)-[:FRIEND_OF]->(i),
 (m)-[:FRIEND_OF]->(j),
 (s)-[:FRIEND_OF]->(j),
-(c)-[:FRIEND_OF]->(j),
+(o)-[:FRIEND_OF]->(j),
 (s)-[:LIVE_IN]->(kon),
 (j)-[:LIVE_IN]->(kon),
 (m)-[:LIVE_IN]->(kon),
