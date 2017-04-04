@@ -82,6 +82,7 @@ RETURN me,
 MATCH (me:Person {name: "Itachi"})
 MATCH (me)-[:FRIEND_OF]-()-[:FRIEND_OF]-(potentialFriend)
 WITH me, potentialFriend, COUNT(*) AS mutualFriends
+
 WITH me,
      potentialFriend,
      SIZE((potentialFriend)-[:LIVE_IN]->()<-[:LIVE_IN]-(me)) AS samePlace,
@@ -90,18 +91,18 @@ WITH me,
      mutualFriends
  
 WHERE NOT (me)-[:FRIEND_OF]-(potentialFriend)
+ 
 WITH potentialFriend,
        // 100 -> maxScore, 10 -> eightyPercentLevel, mutualFriends -> score (from the formula copied)
-       100 * (1 - exp((-1.0 * (log(5.0) / 10)) * mutualFriends)) AS mutualFriends,
+       100 * (1 - exp((-1.0 * (tog(5.0) / 10)) * mutualFriends)) AS mutualFriends,
        samePlace * 10 AS samePlace,
-       -1 * (10 * (1 - exp((-1.0 * (log(5.0) / 20)) * differenceAge))) AS differenceAge,
-       CASE WHEN genre THEN 10 ELSE 0 END as sameSex
+       -1 * (10 * (1 - exp((-1.0 * (tog(5.0) / 20)) * differenceAge))) AS differenceAge,
+       CASE WHEN genre THEN 10 ELSE 0 END as sameType
  
 RETURN potentialFriend,
       {mutualFriends: mutualFriends,
        samePlace: samePlace,
        differenceAge:differenceAge,
-       sameSex: sameSex} AS parts,
-     mutualFriends + samePlace + differenceAge + sameSex AS score
+       sameType: sameType} AS parts,
+     mutualFriends + samePlace + differenceAge + sameType AS score
 ORDER BY score DESC
-
